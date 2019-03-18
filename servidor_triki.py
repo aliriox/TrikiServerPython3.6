@@ -13,6 +13,7 @@ import mysql.connector
 from mysql.connector import errorcode
 import socket
 import threading
+import time
 
 # se define una lista de hilos que conectan con los clientes del servidor
 # tantos hilos como clientes necesiten
@@ -42,9 +43,21 @@ def printTablero():
 			cadena = cadena + "["+str(tablero[i][j])+"]"
 		print(cadena)
 
+# funcion que me permite saber si hay alguna jugada disponible en el juego
+def esposiblejugar():
+	global tablero
+	tmp = False
+	for i in tablero:
+		for j in i:
+			if j == 0:
+				tmp = True
+	return True		
+
 # funcion que evalua el tablero y determina si hay un ganador
 def bucarGanador():
 	global tablero
+	hayganador = False
+	mensaje = ""
 
 	# se define jugador uno y se representa en el tablero con 1
 	# se define jugador dos y se representa en el tablero con -1
@@ -56,23 +69,37 @@ def bucarGanador():
 	for i in range(3):
 		contador1 = 0
 		contador2 = 0
-		for i in range(3):
+		for j in range(3):
 			contador1 += tablero[i][j]
 			contador2 += tablero[j][i]
 		if contador1 == 3 or contador2 == 3:
 			print ("ganador jugador1")
+			hayganador = True
+			mensaje = "ganador jugador1"
 		elif contador1 == -3 or contador2 == -3:
 			print ("ganador jugador2")
+			hayganador = True
+			mensaje = "ganador jugador2"
 		else:
 			pass
 
 	# ahora buscamos un ganador por las diagonales del juego
 	if tablero[0][0] + tablero[1][1] + tablero[2][2] == 3:
 		print ("ganador jugador1")
+		hayganador = True
+		mensaje = "ganador jugador1"
 	elif tablero[0][2] + tablero[1][1] + tablero[2][0] == -3:
 		print ("ganador jugador2")
+		hayganador = True
+		mensaje = "ganador jugador2"
 	else:
 		pass
+
+	if not esposiblejugar():
+		hayganador = True
+		mensaje = "se declara empate"	
+
+	return hayganador, mensaje	
 
 # funcion que me permite cambiar los valores del tablero si esta disponible
 def ingresarTablero(x , y, valor):
@@ -88,15 +115,7 @@ def ingresarTablero(x , y, valor):
 	else:
 		print("jugada invalida")
 
-# funcion que me permite saber si hay alguna jugada disponible en el juego
-def esposiblejugar():
-	global tablero
-	tmp = False
-	for i in tablero:
-		for j in i:
-			if j == 0:
-				tmp = True
-	return True
+
 
 def validarjugada(msm, turno):
 
@@ -138,7 +157,7 @@ def validarjugada(msm, turno):
 		x = 2;
 		y = 2;
 	else:
-		pass
+		print("ingreso de posicion invalida")
 
 	if esposiblejugar():
 		ingresarTablero(x,y,valor)
@@ -219,6 +238,7 @@ class MyThread(threading.Thread):
 		global jugadores_conectados
 		self.socket = socket
 		self.sc, self.addr = socket.accept()
+		self.conectado = True
 		print ("usuario "+str(num)+ " se ha conectado")
 		self.sc.settimeout(1) 
 		self.num = num
@@ -238,6 +258,9 @@ class MyThread(threading.Thread):
 		msm = msm.encode()
 		self.sc.send(msm)
 
+	def estaConectado(self):
+		return self.conectado
+
 	def enviarTablero(self):
 		global tablero
 
@@ -246,6 +269,7 @@ class MyThread(threading.Thread):
 			for j in range(3):
 				cadena = cadena + "["+str(tablero[i][j])+"]"
 			self.mensaje(cadena)
+			time.sleep(0.1)
 
 	def run(self):
 
@@ -259,11 +283,22 @@ class MyThread(threading.Thread):
 
 		if self.num != -1:
 			while True:
-				if jugadores_conectados == 2:
+				ganador, msm = bucarGanador()
+				if ganador:
+					self.mensaje(msm)
+					print("Fin de la partida")
+					time.sleep(0.1)
+					self.mensaje("fin")
+					break
+				elif jugadores_conectados >= 2:
+					advertespera = False
 					if not bienvenidos:
 						self.mensaje("   Bienvenidos a aliriox Triki!!!  ")
+						time.sleep(0.1)
 						self.mensaje("todos los jugadores estan conectados")
+						time.sleep(0.1)
 						self.mensaje("link start")
+						time.sleep(0.1)
 						bienvenidos = True
 
 					if self.num == turno:
@@ -278,6 +313,11 @@ class MyThread(threading.Thread):
 							mensaje = mensaje.decode()
 							if mensaje == "exit":
 								print ("usuario "+str(self.num)+" cerro sesion")
+								self.conectado = False
+								jugadores_conectados -= 1
+								for i in hilos:
+									if i.Num() != -1 and i.Num() != self.num and i.estaConectado():
+										i.mensaje("usuario "+str(self.num)+" cerro sesion")
 								if self.num == 1:
 									turno += 1
 								elif self.num == 2:
@@ -290,7 +330,13 @@ class MyThread(threading.Thread):
 						except socket.timeout:
 							pass
 					else:
-						pass
+						mensaje = None
+						try:
+							mensaje = self.sc.recv(1024)
+							mensaje = mensaje.decode()
+							self.mensaje("espere su turno")
+						except socket.timeout:
+							pass
 				else:
 					if not advertespera:
 						self.mensaje("...esperando jugadores...")
@@ -298,6 +344,10 @@ class MyThread(threading.Thread):
 			self.sc.close()
 			self.sc, self.addr = self.socket.accept()
 			print ("usuario "+ str(self.num) + " se ha conectado")
+			jugadores_conectados += 1
+			self.conectado = True
+			bienvenidos = False
+			enviartablero = True
 			self.run()
 		else:
 			mensaje = "servidor no disponible"

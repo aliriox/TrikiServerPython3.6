@@ -1,6 +1,18 @@
+"""
+                /////////////////////////////////////////
+                /                                       /
+                /   PYTHON VERSION 3.6.4                /
+                /   MYSQLCONNECTOR VERSION 8.0.15       /
+                /   AUTHOR: ALIRIOX                     /
+                /   SERVIDOR VERSION: MARIADB 10.1.36   /
+                /   TKINTER VERSION 8.6.6               /
+                /                                       /
+                /////////////////////////////////////////
+"""
 import socket
 import select
 import threading
+import tkinter
 
 contin = True
 
@@ -19,6 +31,11 @@ class MyThread(threading.Thread):
                 mensaje = mensaje.decode()
                 print ("< "+mensaje)
                 if mensaje == "servidor no disponible":
+                    print("presione enter para terminar.....")
+                    contin = False
+                elif mensaje == "fin":
+                    print("*******fin de la partida********")
+                    print("presione enter para terminar.....")
                     contin = False
             except socket.timeout:
                 pass
@@ -50,6 +67,9 @@ if __name__ == '__main__':
     s.settimeout(1)
     s.connect(("localhost", 9999))
     print ("estas conctado al servidor")
+
+    ventana = tk()
+    ventana.title("Bienvenido a alirixTriki!!")
 
     for i in range(2):
         hi = MyThread(s,i+1)
