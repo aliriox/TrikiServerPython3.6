@@ -12,7 +12,7 @@
 import socket
 import select
 import threading
-import tkinter
+from tkinter import *
 
 contin = True
 
@@ -63,21 +63,23 @@ if __name__ == '__main__':
 
     hilos = []
 
-    s = socket.socket()
-    s.settimeout(1)
-    s.connect(("localhost", 9999))
+    #s = socket.socket()
+    #s.settimeout(1)
+    #s.connect(("localhost", 9999))
     print ("estas conctado al servidor")
 
-    ventana = tk()
+    ventana = Tk()
     ventana.title("Bienvenido a alirixTriki!!")
+    ventana.geometry("600x600")
+    ventana.mainloop()
 
-    for i in range(2):
-        hi = MyThread(s,i+1)
-        hi.start()
-        hilos.append(hi)
+    #for i in range(2):
+    #    hi = MyThread(s,i+1)
+    #    hi.start()
+    #    hilos.append(hi)
 
-    for hilo in hilos:
-        hilo.join()  
+    #for hilo in hilos:
+    #    hilo.join()  
 
     print ("connect close")
-    s.close()
+    #s.close()
