@@ -15,6 +15,14 @@ import threading
 from tkinter import *
 
 contin = True
+ventana = Tk()
+
+def leftclick(event):
+    print("left")
+def middleclick(event):
+    print("middle")
+def rightclick(event):
+    print("right")
 
 class MyThread(threading.Thread):
     def __init__(self, socket, num):
@@ -56,7 +64,6 @@ class MyThread(threading.Thread):
             self.escuchar()
         elif self.num == 2:
             self.escribir()
-        
 
 
 if __name__ == '__main__':
@@ -68,9 +75,15 @@ if __name__ == '__main__':
     #s.connect(("localhost", 9999))
     print ("estas conctado al servidor")
 
-    ventana = Tk()
-    ventana.title("Bienvenido a alirixTriki!!")
-    ventana.geometry("600x600")
+    ventana.title("Bienvenido a alirioxTriki!!")
+    ventana.geometry("354x281")
+    imagen = PhotoImage(file = "imagen/loadtriki.png")
+    frame = Frame(ventana, width=352, height=281)
+    fondo = Label(frame, image = imagen).place(x=0,y=0)
+    frame.bind("<Button-1>", leftclick)
+    frame.bind("<Button-2>", middleclick)
+    frame.bind("<Button-3>", rightclick)
+    frame.pack()
     ventana.mainloop()
 
     #for i in range(2):
