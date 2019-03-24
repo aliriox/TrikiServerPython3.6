@@ -294,11 +294,11 @@ class MyThread(threading.Thread):
 					advertespera = False
 					if not bienvenidos:
 						self.mensaje("   Bienvenidos a aliriox Triki!!!  ")
-						time.sleep(0.1)
+						time.sleep(0.5)
 						self.mensaje("todos los jugadores estan conectados")
-						time.sleep(0.1)
+						time.sleep(0.5)
 						self.mensaje("link start")
-						time.sleep(0.1)
+						time.sleep(0.5)
 						bienvenidos = True
 
 					if self.num == turno:
