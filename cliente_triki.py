@@ -20,9 +20,27 @@ s = socket.socket()
 def mouseClick(event):
     
     print(event.x,event.y)
-    imagen = PhotoImage(file="imagen/O.gif")
-    sprite = Label(ventana, image = imagen)
-    sprite.place(x=event.x,y=event.y)
+    fondo1 = Label(ventana, image = imagen_O)
+    if event.x > 32 and event.x < 115 and event.y < 88 and event.y > 10:
+        fondo1.place(x=42,y=15)
+    elif event.x > 130 and event.x < 205 and event.y < 88 and event.y > 10:
+        fondo1.place(x=132.5,y=15)
+    elif event.x > 220 and event.x < 295 and event.y < 88 and event.y > 10:
+        fondo1.place(x=223,y=15)
+    elif event.x > 32 and event.x < 115 and event.y < 175 and event.y > 105:
+        fondo1.place(x=42,y=107)
+    elif event.x > 130 and event.x < 205 and event.y < 175 and event.y > 105:
+        fondo1.place(x=132.5,y=107)
+    elif event.x > 220 and event.x < 295 and event.y < 175 and event.y > 105:
+        fondo1.place(x=223,y=107)
+    elif event.x > 32 and event.x < 115 and event.y < 267 and event.y > 195:
+        fondo1.place(x=42,y=198)
+    elif event.x > 130 and event.x < 205 and event.y < 267 and event.y > 195:
+        fondo1.place(x=132.5,y=198)
+    elif event.x > 220 and event.x < 295 and event.y < 267 and event.y > 195:
+        fondo1.place(x=223,y=198)
+    cambio = True
+
 
 '''
 class GUI(threading.Thread):
@@ -79,7 +97,7 @@ class MyThread(threading.Thread):
 if __name__ == '__main__':
 
     hilos = []
-
+    cambio = True
     s.settimeout(1)
     s.connect(("localhost", 9999))
     print ("estas conctado al servidor")
@@ -87,13 +105,22 @@ if __name__ == '__main__':
     ventana = Tk()
     ventana.title("Bienvenido a alirioxTriki!!")
     ventana.geometry("354x281")
-    canvas = Canvas(ventana,width=254,height=281)
-    canvas.place(x=0,y=0)
-    imagen = PhotoImage(file = "imagen/loadtriki.gif")
-    fondo = Label(ventana, image = imagen).place(x=0,y=0)
+    imagen_fondo = PhotoImage(file = "imagen/triki.gif")
+    imagen_O = PhotoImage(file = "imagen/O.gif")
+    imagen_x = PhotoImage(file = "imagen/x.gif")
+    fondo = Label(ventana, image = imagen_fondo).place(x=0,y=0)
     ventana.bind("<Button>", mouseClick)
     
     while contin:
+        if cambio:
+            try:
+                ventana.update()
+            except TclError:
+                mensaje = "exit"
+                mensaje = mensaje.encode()
+                s.send(mensaje)
+                cambio = False
+                break
         try:
             mensaje = s.recv(1024)
             mensaje = mensaje.decode()
@@ -101,7 +128,7 @@ if __name__ == '__main__':
             if mensaje == "servidor no disponible":
                 print("presione enter para terminar.....")
                 contin = False
-            elif mensaje == "fin":
+            elif mensaje == "exit":
                 print("*******fin de la partida********")
                 print("presione enter para terminar.....")
                 contin = False
@@ -110,16 +137,10 @@ if __name__ == '__main__':
                 imagen = PhotoImage(file="imagen/triki.png")
                 fondo.configure(image = imagen)
                 fondo.image = imagen
+                cambio = True
 
         except socket.timeout:
             pass
-        try:
-            ventana.update()
-        except TclError:
-            mensaje = "exit"
-            mensaje = mensaje.encode()
-            s.send(mensaje)
-            break
 
     ventana.mainloop()
 
