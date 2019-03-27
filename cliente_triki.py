@@ -10,36 +10,53 @@
                 /////////////////////////////////////////
 """
 import socket
-import select
 import threading
 from tkinter import *
+import time
 
 contin = True
+suTurno = False
 s = socket.socket()
 
 def mouseClick(event):
-    
-    print(event.x,event.y)
-    fondo1 = Label(ventana, image = imagen_O)
-    if event.x > 32 and event.x < 115 and event.y < 88 and event.y > 10:
-        fondo1.place(x=42,y=15)
-    elif event.x > 130 and event.x < 205 and event.y < 88 and event.y > 10:
-        fondo1.place(x=132.5,y=15)
-    elif event.x > 220 and event.x < 295 and event.y < 88 and event.y > 10:
-        fondo1.place(x=223,y=15)
-    elif event.x > 32 and event.x < 115 and event.y < 175 and event.y > 105:
-        fondo1.place(x=42,y=107)
-    elif event.x > 130 and event.x < 205 and event.y < 175 and event.y > 105:
-        fondo1.place(x=132.5,y=107)
-    elif event.x > 220 and event.x < 295 and event.y < 175 and event.y > 105:
-        fondo1.place(x=223,y=107)
-    elif event.x > 32 and event.x < 115 and event.y < 267 and event.y > 195:
-        fondo1.place(x=42,y=198)
-    elif event.x > 130 and event.x < 205 and event.y < 267 and event.y > 195:
-        fondo1.place(x=132.5,y=198)
-    elif event.x > 220 and event.x < 295 and event.y < 267 and event.y > 195:
-        fondo1.place(x=223,y=198)
-    cambio = True
+    mensaje = ""    
+    if suTurno:
+        fondo1 = Label(ventana, image = imagen_O)
+        if event.x > 32 and event.x < 115 and event.y < 88 and event.y > 10:
+            #fondo1.place(x=42,y=15)
+            mensaje = "1"
+        elif event.x > 130 and event.x < 205 and event.y < 88 and event.y > 10:
+            #fondo1.place(x=132.5,y=15)
+            mensaje = "2"
+        elif event.x > 220 and event.x < 295 and event.y < 88 and event.y > 10:
+            #fondo1.place(x=223,y=15)
+            mensaje = "3"
+        elif event.x > 32 and event.x < 115 and event.y < 175 and event.y > 105:
+            #fondo1.place(x=42,y=107)
+            mensaje = "4"
+        elif event.x > 130 and event.x < 205 and event.y < 175 and event.y > 105:
+            #fondo1.place(x=132.5,y=107)
+            mensaje = "5"
+        elif event.x > 220 and event.x < 295 and event.y < 175 and event.y > 105:
+            #fondo1.place(x=223,y=107)
+            mensaje = "6"
+        elif event.x > 32 and event.x < 115 and event.y < 267 and event.y > 195:
+            #fondo1.place(x=42,y=198)
+            mensaje = "7"
+        elif event.x > 130 and event.x < 205 and event.y < 267 and event.y > 195:
+            #fondo1.place(x=132.5,y=198)
+            mensaje = "8"
+        elif event.x > 220 and event.x < 295 and event.y < 267 and event.y > 195:
+            #fondo1.place(x=223,y=198)
+            mensaje = "9"
+        if mensaje != "":
+            print("enviando posicion")
+            mensaje = mensaje.encode()
+            s.send(mensaje)
+        else:
+            pass
+    else:
+        print("espere su turno")
 
 
 '''
@@ -104,10 +121,12 @@ if __name__ == '__main__':
 
     ventana = Tk()
     ventana.title("Bienvenido a alirioxTriki!!")
-    ventana.geometry("354x281")
-    imagen_fondo = PhotoImage(file = "imagen/triki.gif")
+    ventana.geometry("337x300")
+    imagen_fondo = PhotoImage(file = "imagen/loadtriki.gif")
     imagen_O = PhotoImage(file = "imagen/O.gif")
     imagen_x = PhotoImage(file = "imagen/x.gif")
+    imagen_R = PhotoImage(file = "imagen/turnoR.gif")
+    imagen_V = PhotoImage(file = "imagen/turnoV.gif")
     fondo = Label(ventana, image = imagen_fondo).place(x=0,y=0)
     ventana.bind("<Button>", mouseClick)
     
@@ -116,10 +135,7 @@ if __name__ == '__main__':
             try:
                 ventana.update()
             except TclError:
-                mensaje = "exit"
-                mensaje = mensaje.encode()
-                s.send(mensaje)
-                cambio = False
+                print("--saliendo--")
                 break
         try:
             mensaje = s.recv(1024)
@@ -130,19 +146,25 @@ if __name__ == '__main__':
                 contin = False
             elif mensaje == "exit":
                 print("*******fin de la partida********")
-                print("presione enter para terminar.....")
+                s.send("exit".encode())
                 contin = False
             elif mensaje == "link start":
                 print("iniciando tablero")
                 imagen = PhotoImage(file="imagen/triki.png")
-                fondo.configure(image = imagen)
-                fondo.image = imagen
+                fondo = Label(ventana, image = imagen).place(x=0,y=0)
+                textlabel = Label(ventana, text="Su turno: ").place(x=100,y=282)
+                turnoC = Label(ventana, image=imagen_R).place(x=170,y=285)
                 cambio = True
+            elif mensaje == "su turno":
+                turnoC = Label(ventana, image=imagen_V).place(x=170,y=285)
+                suTurno = True
 
         except socket.timeout:
             pass
 
+
     ventana.mainloop()
+    s.send("exit".encode())
 
     '''
     gui = GUI()

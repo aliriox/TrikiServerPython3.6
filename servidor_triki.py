@@ -51,7 +51,7 @@ def esposiblejugar():
 		for j in i:
 			if j == 0:
 				tmp = True
-	return True		
+	return tmp		
 
 # funcion que evalua el tablero y determina si hay un ganador
 def bucarGanador():
@@ -126,7 +126,13 @@ def validarjugada(msm, turno):
 	else:
 		valor = -1
 
-	posicion = int(msm)
+	posicion = 0
+
+	try:
+		posicion = int(msm)
+	except ValueError:
+		pass
+
 	x = -1
 	y = -1
 	if posicion == 1:
@@ -159,10 +165,7 @@ def validarjugada(msm, turno):
 	else:
 		print("ingreso de posicion invalida")
 
-	if esposiblejugar():
-		ingresarTablero(x,y,valor)
-	else:
-		print("no es posible jugar")
+	return x,y,valor
 
 # funcion de ingresar datos en una base de datos
 def ingresarusuario(crs):
@@ -303,7 +306,7 @@ class MyThread(threading.Thread):
 
 					if self.num == turno:
 						if enviartablero:
-							self.enviarTablero()
+						#	self.enviarTablero()
 							self.mensaje("su turno")
 							enviartablero = False
 
@@ -325,7 +328,18 @@ class MyThread(threading.Thread):
 								enviartablero = True
 								break
 							else:
-								validarjugada(mensaje,self.num)
+								if esposiblejugar():
+									x,y,valor = validarjugada(mensaje,self.num)
+									if x != -1:
+										ingresarTablero(x,y,valor)
+									else:
+										mensaje = "invalido"
+										mensaje = mensaje.encode()
+										self.mensaje(mensaje)
+								else:
+									mensaje="empate"
+									mensaje = mensaje.encode()
+									self.mensaje(mensaje)
 								enviartablero = True
 						except socket.timeout:
 							pass
@@ -341,6 +355,21 @@ class MyThread(threading.Thread):
 					if not advertespera:
 						self.mensaje("...esperando jugadores...")
 						advertespera = True
+					try:
+						mensaje = self.sc.recv(1024)
+						mensaje = mensaje.decode()
+						if mensaje == "exit":
+							print ("usuario "+str(self.num)+" cerro sesion")
+							self.conectado = False
+							jugadores_conectados -= 1
+							if self.num == 1:
+								turno += 1
+							elif self.num == 2:
+								turno -= 1
+						else:
+							advertespera = True
+					except socket.timeout:
+						pass
 			self.sc.close()
 			self.sc, self.addr = self.socket.accept()
 			print ("usuario "+ str(self.num) + " se ha conectado")
