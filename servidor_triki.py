@@ -101,19 +101,25 @@ def bucarGanador():
 
 	return hayganador, mensaje	
 
-# funcion que me permite cambiar los valores del tablero si esta disponible
 def ingresarTablero(x , y, valor):
 	global tablero
 	global turno
 
+	tablero[x][y] = valor
+	if valor == 1:
+		turno += 1
+	elif valor == -1:
+		turno -= 1
+
+# funcion que me permite cambiar los valores del tablero si esta disponible
+def boolingresarTablero(x , y):
+	global tablero
+	global turno
+
 	if tablero[x][y] == 0:
-		tablero[x][y] = valor
-		if valor == 1:
-			turno += 1
-		elif valor == -1:
-			turno -= 1
+		return True
 	else:
-		print("jugada invalida")
+		return False
 
 
 
@@ -301,13 +307,20 @@ class MyThread(threading.Thread):
 						self.mensaje("todos los jugadores estan conectados")
 						time.sleep(0.5)
 						self.mensaje("link start")
-						time.sleep(0.5)
+						time.sleep(1)
+						if self.num == 1:
+							self.mensaje("X")
+						elif self.num == 2:
+							self.mensaje("O")
+						else:
+							pass
 						bienvenidos = True
-
+					#print(turno)
 					if self.num == turno:
 						if enviartablero:
 						#	self.enviarTablero()
 							self.mensaje("su turno")
+							time.sleep(0.5)
 							enviartablero = False
 
 						mensaje = None
@@ -322,25 +335,30 @@ class MyThread(threading.Thread):
 									if i.Num() != -1 and i.Num() != self.num and i.estaConectado():
 										i.mensaje("usuario "+str(self.num)+" cerro sesion")
 								if self.num == 1:
-									turno += 1
+									turno = 2
 								elif self.num == 2:
-									turno -= 1
+									turno = 1
 								enviartablero = True
 								break
 							else:
 								if esposiblejugar():
 									x,y,valor = validarjugada(mensaje,self.num)
-									if x != -1:
+									if x != -1 and boolingresarTablero(x,y):
 										ingresarTablero(x,y,valor)
+										self.mensaje("valido")
+										printTablero()
+										if self.num == 1:
+											turno = 2
+										elif self.num == 2:
+											turno = 1
+										for i in hilos:
+											if i.Num() != -1 and i.Num() != self.num and i.estaConectado():
+												i.mensaje(mensaje)
+										enviartablero = True
 									else:
-										mensaje = "invalido"
-										mensaje = mensaje.encode()
-										self.mensaje(mensaje)
+										self.mensaje("invalido")
 								else:
-									mensaje="empate"
-									mensaje = mensaje.encode()
-									self.mensaje(mensaje)
-								enviartablero = True
+									self.mensaje("empate")
 						except socket.timeout:
 							pass
 					else:
@@ -363,9 +381,9 @@ class MyThread(threading.Thread):
 							self.conectado = False
 							jugadores_conectados -= 1
 							if self.num == 1:
-								turno += 1
+								turno = 2
 							elif self.num == 2:
-								turno -= 1
+								turno = 1
 						else:
 							advertespera = True
 					except socket.timeout:
