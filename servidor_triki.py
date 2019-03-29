@@ -42,6 +42,7 @@ def printTablero():
 		for j in range(3):
 			cadena = cadena + "["+str(tablero[i][j])+"]"
 		print(cadena)
+	print("")
 
 # funcion que me permite saber si hay alguna jugada disponible en el juego
 def esposiblejugar():
@@ -58,6 +59,7 @@ def bucarGanador():
 	global tablero
 	hayganador = False
 	mensaje = ""
+	mensaje1 = ""
 
 	# se define jugador uno y se representa en el tablero con 1
 	# se define jugador dos y se representa en el tablero con -1
@@ -72,34 +74,56 @@ def bucarGanador():
 		for j in range(3):
 			contador1 += tablero[i][j]
 			contador2 += tablero[j][i]
-		if contador1 == 3 or contador2 == 3:
-			print ("ganador jugador1")
+		if contador1 == 3:
+			#print ("ganador jugador1")
 			hayganador = True
 			mensaje = "ganador jugador1"
-		elif contador1 == -3 or contador2 == -3:
-			print ("ganador jugador2")
+			mensaje1 = "F " + str(i)
+		elif contador2 == 3:
+			#print ("ganador jugador1")
+			hayganador = True
+			mensaje = "ganador jugador1"
+			mensaje1 = "C " + str(i)
+		elif contador1 == -3:
+			#print ("ganador jugador2")
 			hayganador = True
 			mensaje = "ganador jugador2"
+			mensaje1 = "F " + str(i)
+		elif contador2 == -3:
+			#print ("ganador jugador2")
+			hayganador = True
+			mensaje = "ganador jugador2"
+			mensaje1 = "C " + str(i)
 		else:
 			pass
 
 	# ahora buscamos un ganador por las diagonales del juego
 	if tablero[0][0] + tablero[1][1] + tablero[2][2] == 3:
-		print ("ganador jugador1")
+		#print ("ganador jugador1")
 		hayganador = True
 		mensaje = "ganador jugador1"
-	elif tablero[0][2] + tablero[1][1] + tablero[2][0] == -3:
-		print ("ganador jugador2")
+		mensaje1 = "D 1"
+	elif tablero[0][0] + tablero[1][1] + tablero[2][2] == -3:
 		hayganador = True
 		mensaje = "ganador jugador2"
+		mensaje1 = "D 1"
+	elif tablero[0][2] + tablero[1][1] + tablero[2][0] == 3:
+		hayganador = True
+		mensaje = "ganador jugador1"
+		mensaje1 = "D 2"
+	elif tablero[0][2] + tablero[1][1] + tablero[2][0] == -3:
+		#print ("ganador jugador2")
+		hayganador = True
+		mensaje = "ganador jugador2"
+		mensaje1 = "D 2"
 	else:
 		pass
 
-	if not esposiblejugar():
-		hayganador = True
-		mensaje = "se declara empate"	
+	#if not esposiblejugar():
+	#	hayganador = True
+	#	mensaje = "se declara empate"	
 
-	return hayganador, mensaje	
+	return hayganador, mensaje, mensaje1
 
 def ingresarTablero(x , y, valor):
 	global tablero
@@ -292,11 +316,12 @@ class MyThread(threading.Thread):
 
 		if self.num != -1:
 			while True:
-				ganador, msm = bucarGanador()
+				ganador, msm, msm1 = bucarGanador()
 				if ganador:
 					self.mensaje(msm)
-					print("Fin de la partida")
 					time.sleep(0.1)
+					self.mensaje(msm1)
+					time.sleep(5)
 					self.mensaje("fin")
 					break
 				elif jugadores_conectados >= 2:
@@ -315,6 +340,7 @@ class MyThread(threading.Thread):
 						else:
 							pass
 						bienvenidos = True
+						time.sleep(0.5)
 					#print(turno)
 					if self.num == turno:
 						if enviartablero:
@@ -346,6 +372,7 @@ class MyThread(threading.Thread):
 									if x != -1 and boolingresarTablero(x,y):
 										ingresarTablero(x,y,valor)
 										self.mensaje("valido")
+										time.sleep(0.1)
 										printTablero()
 										if self.num == 1:
 											turno = 2
@@ -357,8 +384,10 @@ class MyThread(threading.Thread):
 										enviartablero = True
 									else:
 										self.mensaje("invalido")
+										time.sleep(0.5)
 								else:
 									self.mensaje("empate")
+									time.sleep(0.5)
 						except socket.timeout:
 							pass
 					else:

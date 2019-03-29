@@ -14,14 +14,16 @@ import threading
 from tkinter import *
 import time
 
-contin = True
 suTurno = False
-s = socket.socket()
 Recambio = [0,0]
+s = socket.socket()
 
 def mouseClick(event):
 
     global suTurno
+    global s
+
+
     mensaje = "0"
     Recambio[0] = 0
     Recambio[1] = 0    
@@ -180,10 +182,15 @@ class MyThread(threading.Thread):
             self.escribir()
 '''
 
-if __name__ == '__main__':
+def main():
+
+    global Recambio
+    global suTurno
+    global s
 
     hilos = []
-    #cambio = True
+    contin = True
+    ganador = False
     s.settimeout(1)
     s.connect(("localhost", 9999))
     print ("estas conctado al servidor")
@@ -194,10 +201,14 @@ if __name__ == '__main__':
     imagen_fondo = PhotoImage(file = "imagen/loadtriki.gif")
     imagen_o = PhotoImage(file = "imagen/O.gif")
     imagen_x = PhotoImage(file = "imagen/x.gif")
-    imagen_J1 = None
-    imagen_J2 = None
     imagen_R = PhotoImage(file = "imagen/turnoR.gif")
     imagen_V = PhotoImage(file = "imagen/turnoV.gif")
+    imagenGF = PhotoImage(file = "imagen/ganaVert.gif")
+    imagenGC = PhotoImage(file = "imagen/ganaHorz.gif")
+    imagenGD1 = PhotoImage(file = "imagen/gana0022.gif")
+    imagenGD2 = PhotoImage(file = "imagen/gana0220.gif")
+    imagen_J1 = None
+    imagen_J2 = None
     fondo = Label(ventana, image = imagen_fondo).place(x=0,y=0)
     ventana.bind("<Button>", mouseClick)
     
@@ -217,9 +228,32 @@ if __name__ == '__main__':
             if mensaje == "servidor no disponible":
                 print("presione enter para terminar.....")
                 contin = False
-            elif mensaje == "fin":
+            elif ganador:
+                if mensaje == "F 0":
+                    fondo3 = Label(ventana, image=imagenGC).place(x=0,y=40.5) # y=15
+                elif mensaje == "F 1":
+                    fondo3 = Label(ventana, image=imagenGC).place(x=0,y=132.5) # y=107
+                elif mensaje == "F 2":
+                    fondo3 = Label(ventana, image=imagenGC).place(x=0,y=223.5) # y=198
+                elif mensaje == "C 0":
+                    fondo3 = Label(ventana, image=imagenGF).place(x=49,y=0) # x=42
+                elif mensaje == "C 1":
+                    fondo3 = Label(ventana, image=imagenGF).place(x=139.5,y=0) # x=132.5
+                elif mensaje == "C 2":
+                    fondo3 = Label(ventana, image=imagenGF).place(x=230,y=0) # x=223
+                elif mensaje == "D 1":
+                    fondo3 = Label(ventana, image=imagenGD1).place(x=0,y=0)
+                elif mensaje == "D 2":
+                    fondo3 = Label(ventana, image=imagenGD2).place(x=0,y=0)
+                else:
+                    pass
+                ganador = False
+            elif mensaje == "ganador jugador1" or mensaje == "ganador jugador2":
+                ganador = True
+            elif mensaje == "fin" or mensaje == "empate":
                 print("*******fin de la partida********")
                 contin = False
+                time.sleep(3)
             elif mensaje == "link start":
                 print("iniciando tablero")
                 imagen = PhotoImage(file="imagen/triki.png")
@@ -251,6 +285,10 @@ if __name__ == '__main__':
         except socket.timeout:
             pass
 
+    if not contin:
+        ventana.destroy()
+    else:
+        pass
 
     ventana.mainloop()
     s.send("exit".encode())
@@ -271,3 +309,7 @@ if __name__ == '__main__':
 
     print ("connect close")
     s.close()
+
+if __name__ == '__main__':
+    main()
+    input("enter para terminar")
