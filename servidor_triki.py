@@ -417,6 +417,7 @@ class MyThread(threading.Thread):
 							advertespera = True
 					except socket.timeout:
 						pass
+			print("usuario "+str(self.num)+" se ha desconectado")
 			self.sc.close()
 			self.sc, self.addr = self.socket.accept()
 			print ("usuario "+ str(self.num) + " se ha conectado")

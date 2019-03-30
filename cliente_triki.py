@@ -205,8 +205,7 @@ def main():
     imagen_V = PhotoImage(file = "imagen/turnoV.gif")
     imagenGF = PhotoImage(file = "imagen/ganaVert.gif")
     imagenGC = PhotoImage(file = "imagen/ganaHorz.gif")
-    imagenGD1 = PhotoImage(file = "imagen/gana0022.gif")
-    imagenGD2 = PhotoImage(file = "imagen/gana0220.gif")
+    imagenGD = PhotoImage(file = "imagen/ganaDiag.gif")
     imagen_J1 = None
     imagen_J2 = None
     fondo = Label(ventana, image = imagen_fondo).place(x=0,y=0)
@@ -236,15 +235,25 @@ def main():
                 elif mensaje == "F 2":
                     fondo3 = Label(ventana, image=imagenGC).place(x=0,y=223.5) # y=198
                 elif mensaje == "C 0":
-                    fondo3 = Label(ventana, image=imagenGF).place(x=49,y=0) # x=42
+                    fondo3 = Label(ventana, image=imagenGF).place(x=68.5,y=0) # x=42
                 elif mensaje == "C 1":
-                    fondo3 = Label(ventana, image=imagenGF).place(x=139.5,y=0) # x=132.5
+                    fondo3 = Label(ventana, image=imagenGF).place(x=159,y=0) # x=132.5
                 elif mensaje == "C 2":
-                    fondo3 = Label(ventana, image=imagenGF).place(x=230,y=0) # x=223
+                    fondo3 = Label(ventana, image=imagenGF).place(x=249.5,y=0) # x=223
                 elif mensaje == "D 1":
-                    fondo3 = Label(ventana, image=imagenGD1).place(x=0,y=0)
+                    i = 0
+                    j = 0
+                    while i < 337 and j < 281:
+                        fondo3 = Label(ventana, image=imagenGD).place(x=i,y=j)
+                        i += 18
+                        j += 15
                 elif mensaje == "D 2":
-                    fondo3 = Label(ventana, image=imagenGD2).place(x=0,y=0)
+                    i = 319
+                    j = 0
+                    while i > 0 and j < 281:
+                        fondo3 = Label(ventana, image=imagenGD).place(x=i,y=j)
+                        i -= 18
+                        j += 15
                 else:
                     pass
                 ganador = False
