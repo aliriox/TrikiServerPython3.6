@@ -127,23 +127,21 @@ def bucarGanador():
 
 def ingresarTablero(x , y, valor):
 	global tablero
-	global turno
 
 	tablero[x][y] = valor
+	
+	"""
 	if valor == 1:
 		turno += 1
 	elif valor == -1:
 		turno -= 1
+	"""
 
 # funcion que me permite cambiar los valores del tablero si esta disponible
 def boolingresarTablero(x , y):
 	global tablero
-	global turno
 
-	if tablero[x][y] == 0:
-		return True
-	else:
-		return False
+	return tablero[x][y] == 0
 
 
 
@@ -277,23 +275,28 @@ class MyThread(threading.Thread):
 		self.num = num
 		jugadores_conectados += 1
 
+	# Metodo que me permite verificar la cantidad minima de hilos funcionando
 	def revisar(self):
 		global hilos
 		if len(hilos) == 1:
 			return True
 		else:
 			return False
-		
+	
+	# Metodo que me permite conocer el numero asignado al hilo
 	def Num(self):
 		return self.num
 
+	# Metodo que me permite enviar mensajes una vez conectado el hilo
 	def mensaje(self,msm):
 		msm = msm.encode()
 		self.sc.send(msm)
 
+	# Metodo para averiguar si esta conectado el hilo actual
 	def estaConectado(self):
 		return self.conectado
 
+	# Metodo de prueba que me permitia enviarle el tablero a los clientes.. actualmente no es funcional
 	def enviarTablero(self):
 		global tablero
 
