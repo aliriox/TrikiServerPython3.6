@@ -327,6 +327,10 @@ class MyThread(threading.Thread):
 					time.sleep(5)
 					self.mensaje("fin")
 					break
+				elif not esposiblejugar():
+					self.mensaje("empate")
+					time.sleep(0.5)
+					break
 				elif jugadores_conectados >= 2:
 					advertespera = False
 					if not bienvenidos:
@@ -370,26 +374,23 @@ class MyThread(threading.Thread):
 								enviartablero = True
 								break
 							else:
-								if esposiblejugar():
-									x,y,valor = validarjugada(mensaje,self.num)
-									if x != -1 and boolingresarTablero(x,y):
-										ingresarTablero(x,y,valor)
-										self.mensaje("valido")
-										time.sleep(0.1)
-										printTablero()
-										if self.num == 1:
-											turno = 2
-										elif self.num == 2:
-											turno = 1
-										for i in hilos:
-											if i.Num() != -1 and i.Num() != self.num and i.estaConectado():
-												i.mensaje(mensaje)
-										enviartablero = True
-									else:
-										self.mensaje("invalido")
-										time.sleep(0.5)
+								
+								x,y,valor = validarjugada(mensaje,self.num)
+								if x != -1 and boolingresarTablero(x,y):
+									ingresarTablero(x,y,valor)
+									self.mensaje("valido")
+									time.sleep(0.1)
+									printTablero()
+									if self.num == 1:
+										turno = 2
+									elif self.num == 2:
+										turno = 1
+									for i in hilos:
+										if i.Num() != -1 and i.Num() != self.num and i.estaConectado():
+											i.mensaje(mensaje)
+									enviartablero = True
 								else:
-									self.mensaje("empate")
+									self.mensaje("invalido")
 									time.sleep(0.5)
 						except socket.timeout:
 							pass
